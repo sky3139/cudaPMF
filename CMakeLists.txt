@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 project(bare_earth )
 SET(CMAKE_BUILD_TYPE "Release")
-
 # SET(CMAKE_BUILD_TYPE "Debug")
+
 find_package(PCL REQUIRED)
 find_package(Boost REQUIRED)
 find_package(CUDA REQUIRED)
@@ -24,8 +24,17 @@ InputReader.cpp
 Timer.cc
 )
 target_link_libraries(main 
-${PCL_LIBRARY_DIRS}
 ${PCL_LIBRARIES} -lpthread
 ${OpenCV_LIBRARIES}
-${BOOST_LIBRARY_DIRS}
+${BOOST_LIBRARIES}
+)
+
+cuda_add_executable(sgd seteroGD.cu apmf.h tool.cu rw.cc
+InputReader.cpp
+Timer.cc
+)
+target_link_libraries(sgd 
+${PCL_LIBRARIES} -lpthread
+${OpenCV_LIBRARIES}
+${BOOST_LIBRARIES}
 )

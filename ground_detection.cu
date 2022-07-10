@@ -101,14 +101,11 @@ void xyzwritePCD(std::string file_name, pcl::PointCloud<pcl::PointXYZ> &cloud, s
 
 void cudaPMF2(string path, string filename)
 {
-  // Timer t("all");
-  pcl::PointCloud<MPOINT>::Ptr cloud_src(new pcl::PointCloud<MPOINT>);
   std::vector<int> indices;
   std::vector<MPOINT> __mvs;
   // cout << path + filename << endl;
   ReadPCD_XYZL(__mvs, path + filename);
   pcl::Apmf<MPOINT> pmf;
-  pmf.setInputCloud(cloud_src);
   pmf.setMaxWindowSize(35);
   pmf.setSlope(1.0f);
   pmf.setInitialDistance(0.4f); // 0.5

@@ -14,15 +14,13 @@
 #include <opencv2/opencv.hpp>
 #include "tool.h"
 #include "Timer.hpp"
+
+#define DEBUG
 namespace pcl
 {
   template <typename PointT>
   class Apmf : public pcl::PCLBase<PointT>
   {
-  public:
-    using PointCloud = pcl::PointCloud<PointT>;
-    using PCLBase<PointT>::input_;
-
   public:
     ~Apmf(){};
 

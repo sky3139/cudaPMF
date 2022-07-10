@@ -132,6 +132,8 @@
         "polytope": "cpp",
         "shape": "cpp",
         "state": "cpp",
-        "valueobject": "cpp"
+        "valueobject": "cpp",
+        "operationthread": "cpp",
+        "ref_ptr": "cpp"
     }
 }
