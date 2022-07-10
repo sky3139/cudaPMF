@@ -12,6 +12,7 @@ RUN apt-get -y update
 # COPY ./keyboard /etc /default /keyboard
 RUN apt install cmake gcc g++ sudo -y
 RUN apt install libpcl-dev -y
-RUN sudo apt install -y libopencv-dev libomp-dev  
+RUN sudo apt install -y libopencv-dev libomp-dev git 
+ADD run.sh /
 # ADD  ./ /root/plane/
 # RUN rm -rf /root/plane/build/*

@@ -13,9 +13,9 @@ sudo docker load -i pl_v3.tar
 <!-- 运行后移除的命令 -->
 sudo docker run --rm -it --gpus all  -v /task6:/task6 \
 -v /home/u20/gitee/cudaPMF:/root/cudaPMF \
--v /task6_result/spirt:/task6_result/spirt pl:v3 /usr/bin/bash /root/cudaPMF/run.sh
+-v /task6_result/spirt:/task6_result/spirt pl:v3 /usr/bin/bash run.sh
 
 <!-- 运行后不移除的命令 -->
 sudo docker run  -it --gpus all  -v /task6:/task6 \
--v /home/u20/gitee/cudaPMF:/root/cudaPMF \
+-v /task6_result/spirt/cudaPMF:/root/cudaPMF \
 -v /task6_result/spirt:/task6_result/spirt pl:v3 /usr/bin/bash /root/cudaPMF/run.sh
