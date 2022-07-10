@@ -117,7 +117,7 @@ void cudaPMF2(string path, string filename)
   pmf.extract(indices, __mvs);
   pcdwrite("/task6_result/spirt/" + filename, __mvs, indices);
 }
-int main()
+int main(int c,char **)
 {
   Timer mt("write");
   string inPath("/task6/");
