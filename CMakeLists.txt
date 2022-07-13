@@ -26,7 +26,7 @@ app/InputReader.cpp
 app/Timer.cc
 )
 target_link_libraries(main 
-${PCL_LIBRARIES} -lpthread
+${PCL_LIBRARIES}
 ${OpenCV_LIBRARIES}
 )
 
@@ -38,6 +38,17 @@ app/InputReader.cpp
 app/Timer.cc
 )
 target_link_libraries(sgd 
-${PCL_LIBRARIES} -lpthread
+${PCL_LIBRARIES} 
+${OpenCV_LIBRARIES}
+)
+cuda_add_executable(opengf opengf.cu 
+app/apmf.h 
+app/tool.cu 
+app/rw.cc
+app/InputReader.cpp
+app/Timer.cc
+)
+target_link_libraries(opengf 
+${PCL_LIBRARIES} 
 ${OpenCV_LIBRARIES}
 )
