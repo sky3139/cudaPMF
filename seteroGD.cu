@@ -115,7 +115,7 @@ void readPLY(std::vector<T> &vps, string filename)
 }
 
 template <typename POINT>
-void pcdwrite(std::string file_name, std::vector<POINT> &cloud, std::vector<int> &index)
+void pcdwrite(std::string file_name, std::vector<POINT> &cloud, std::vector<int> &index, bool ascii = true)
 {
   // Timer mt("write");
 
@@ -138,20 +138,34 @@ void pcdwrite(std::string file_name, std::vector<POINT> &cloud, std::vector<int>
   fprintf(fp, "HEIGHT %d\n", 1);
   fprintf(fp, "VIEWPOINT 0 0 0 1 0 0 0\n");
   fprintf(fp, "POINTS %ld\n", cloud.size());
-  fprintf(fp, "DATA ascii\n");
+  if (ascii)
+    fprintf(fp, "DATA ascii\n");
+  else
+    fprintf(fp, "DATA binary\n");
   int cnt = 0;
-  for (int i = 0; i < cloud.size(); i++)
-  {
-    auto &it = cloud[i];
-    if (foo.test(i))
+  if (ascii)
+    for (int i = 0; i < cloud.size(); i++)
     {
-      fprintf(fp, "%f %f %f %d\n", it.x, it.y, it.z, 1);
-      // printf("%f %f %f\n", it.x, it.y, it.z);
-      cnt++;
+      auto &it = cloud[i];
+      if (foo.test(i))
+      {
+        fprintf(fp, "%f %f %f %d\n", it.x, it.y, it.z, 1);
+        // printf("%f %f %f\n", it.x, it.y, it.z);
+        cnt++;
+      }
+      else
+      {
+        fprintf(fp, "%f %f %f %d\n", it.x, it.y, it.z, 0);
+      }
     }
-    else
+  else
+  {
+    for (int i = 0; i < cloud.size(); i++)
     {
-      fprintf(fp, "%f %f %f %d\n", it.x, it.y, it.z, 0);
+      auto &it = cloud[i];
+      uint16_t ret = foo.test(i);
+      fwrite(&it.x, sizeof(float), 3, fp);
+      fwrite(&ret, sizeof(uint16_t), 1, fp);
     }
   }
   // cout << file_name << " " << cnt << endl;
@@ -173,7 +187,7 @@ void cudaPMF2(string path, string filename)
   pmf.max_height_ = 3;
   pmf.extract(indices, __mvs);
   filename = filename.substr(0, filename.size() - 4);
-  pcdwrite("pcd/"+filename + ".pcd", __mvs, indices);
+  pcdwrite("pcd/" + filename + ".pcd", __mvs, indices, false);
 }
 
 int main(int, char **)
@@ -192,7 +206,7 @@ int main(int, char **)
   }
   closedir(dir);
   delete ptr;
-  threadpool executor(1);
+  threadpool executor(12);
   for (int i = 0; i < files.size(); i++) // files.size()
   {
     cout << inPath << files[i] << endl;
