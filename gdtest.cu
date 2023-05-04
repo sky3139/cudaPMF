@@ -18,13 +18,19 @@ void ReadPCD_XYZL(std::vector<T> &vps, string filename)
   FILE *fp;
   fp = fopen(filename.c_str(), "r");
   char str[1024];
+  size_t num = 0;
   for (int i = 0; i < 11; i++)
   {
-    int ret = fscanf(fp, "%[^\n]\n", str);
+    int ret = fscanf(fp, "%s %[^\n]\n", str + 512, str);
+    if (strcmp("POINTS", str + 512) == 0)
+    {
+      num = atoi(str);
+    }
   }
-  vps.resize(124669);
+  // cout << num << endl;
+  vps.resize(num);
   int la;
-  for (size_t i = 0; i < 124669; i++)
+  for (size_t i = 0; i < num; i++)
   {
     auto &p = vps[i];
     int ret = fscanf(fp, "%f %f %f %f\n", &p.x, &p.y, &p.z, &p.intensity);
@@ -97,24 +103,82 @@ void xyzwritePCD(std::string file_name, pcl::PointCloud<pcl::PointXYZ> &cloud, s
     }
   }
 }
+float idist, Maxdist, Slope = 1.0;
+int MaxWindowSize = 15;
 
-void cudaPMF2(string path, string filename)
+void cudaPMF2(string filename)
 {
   std::vector<int> indices;
   std::vector<MPOINT> __mvs;
-  // cout << path + filename << endl;
-  ReadPCD_XYZL(__mvs,  filename);
+  cout << filename << endl;
+  ReadPCD_XYZL(__mvs, filename);
+  {
+    Timer mt("cuda all");
+
+    for (int i = 0; i < 30; i++)
+    {
+      indices.resize(0);
+      pcl::Apmf<MPOINT> pmf;
+      pmf.setMaxWindowSize(MaxWindowSize);
+      pmf.setSlope(Slope);
+      pmf.setInitialDistance(idist); // 0.5
+      pmf.setMaxDistance(Maxdist);   // 3
+      pmf.max_height_ = 3;
+      pmf.extract(indices, __mvs);
+    }
+  }
+
+  pcdwrite("out.pcd", __mvs, indices);
+}
+int main2(int argc, char **av)
+{
+  if (argc < 4)
+  {
+    printf("./gdtest ./out.pcd 0.5 3.0 15 0.1 \n idist=%f Maxdist= %f\n", idist, Maxdist);
+    return -1;
+  }
+  string filename(av[1]);
+  idist = atof(av[2]), Maxdist = atof(av[3]), MaxWindowSize = atoi(av[4]), Slope = atof(av[5]);
+  cudaPMF2("../data/a.pcd");
+}
+
+void cudaPMF(std::vector<MPOINT> __mvs)
+{
+  std::vector<int> indices;
+
+  indices.resize(0);
   pcl::Apmf<MPOINT> pmf;
-  pmf.setMaxWindowSize(35);
-  pmf.setSlope(1.0f);
-  pmf.setInitialDistance(0.4f); // 0.5
-  pmf.setMaxDistance(3.0f);     // 3
+  pmf.setMaxWindowSize(MaxWindowSize);
+  pmf.setSlope(Slope);
+  pmf.setInitialDistance(idist); // 0.5
+  pmf.setMaxDistance(Maxdist);   // 3
   pmf.max_height_ = 3;
   pmf.extract(indices, __mvs);
-  pcdwrite( "out.pcd", __mvs, indices);
 }
-int main(int c,char **)
+
+int main(int argc, char **av)
 {
-  Timer mt("write");
-  cudaPMF2("./","../data/a.pcd");
+  if (argc < 4)
+  {
+    printf("./gdtest ./out.pcd 0.5 3.0 15 0.1 \n idist=%f Maxdist= %f\n", idist, Maxdist);
+    return -1;
+  }
+  string filename(av[1]);
+  idist = atof(av[2]), Maxdist = atof(av[3]), MaxWindowSize = atoi(av[4]), Slope = atof(av[5]);
+  char names[256];
+  vector<std::vector<MPOINT> *> pts;
+  for (int i = 0; i < 100; i++)
+  {
+    std::vector<MPOINT> *pmvs = new std::vector<MPOINT>();
+    sprintf(names, "/home/u20/lei/home/lei/桌面/00/bin_to_pcd/build/%d.pcd", i);
+    ReadPCD_XYZL(*pmvs, names);
+    pts.push_back(pmvs);
+  }
+  {
+    Timer mt("cuda all");
+    for (int i = 0; i < 100; i++)
+    {
+      cudaPMF(*pts[i]);
+    }
+  }
 }

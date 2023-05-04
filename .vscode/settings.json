@@ -134,6 +134,7 @@
         "state": "cpp",
         "valueobject": "cpp",
         "operationthread": "cpp",
-        "ref_ptr": "cpp"
+        "ref_ptr": "cpp",
+        "stateattribute": "cpp"
     }
 }

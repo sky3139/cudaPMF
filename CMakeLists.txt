@@ -51,3 +51,12 @@ target_link_libraries(gdtest
     ${BOOST_LIBRARIES}
 )
 
+
+add_executable(pmf pmf.cc 
+    Timer.cc
+)
+target_link_libraries(pmf
+    ${PCL_LIBRARIES} -lpthread
+    ${OpenCV_LIBRARIES}
+    ${BOOST_LIBRARIES}
+)
